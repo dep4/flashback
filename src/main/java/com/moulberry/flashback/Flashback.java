@@ -133,7 +133,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
-public class Flashback implements ModInitializer, ClientModInitializer {
+public class Flashback {
     public static final Logger LOGGER = LoggerFactory.getLogger("flashback");
 
     public static final int MAGIC = 0xD780E884;
@@ -195,7 +195,6 @@ public class Flashback implements ModInitializer, ClientModInitializer {
         return configDirectory;
     }
 
-    @Override
     public void onInitialize() {
         PayloadTypeRegistry.playS2C().register(FinishedServerTick.TYPE,
                 StreamCodec.unit(FinishedServerTick.INSTANCE));
@@ -214,7 +213,6 @@ public class Flashback implements ModInitializer, ClientModInitializer {
         PayloadTypeRegistry.playS2C().register(FlashbackRawCustomPayload.TYPE, FlashbackRawCustomPayload.STREAM_CODEC);
     }
 
-    @Override
     public void onInitializeClient() {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve("flashback");
 
