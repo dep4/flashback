@@ -159,7 +159,7 @@ public class Recorder {
 
         this.metadata.dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
         this.metadata.protocolVersion = SharedConstants.getProtocolVersion();
-        this.metadata.versionString = FabricLoader.getInstance().getRawGameVersion();
+        this.metadata.versionString = SharedConstants.getCurrentVersion().name();
 
         if (Flashback.isBobbyLoaded) {
             try {
