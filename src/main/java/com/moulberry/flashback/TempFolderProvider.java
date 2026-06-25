@@ -1,6 +1,7 @@
 package com.moulberry.flashback;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class TempFolderProvider {
     }
 
     private static Path getSharedTempFolder() {
-        return Flashback.getDataDirectory().resolve("temp");
+        return Minecraft.getInstance().gameDirectory.toPath().resolve("temp");
     }
 
     public static Path getTypedTempFolder(TempFolderType type) {
