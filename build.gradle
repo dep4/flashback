@@ -14,9 +14,10 @@ plugins {
     id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id 'com.gradleup.shadow' version "9.3.0"
     id 'maven-publish'
+    id "com.tddworks.central-publisher" version "0.2.0-alpha.1"
 }
 
-version = project.mod_version
+version = System.getenv("INPUTS_VERSION")
 group = project.maven_group
 
 base {
@@ -163,6 +164,7 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
+    withJavadocJar()
 
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
     sourceCompatibility = JavaVersion.VERSION_25
@@ -173,6 +175,7 @@ jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}"}
     }
+    exclude('assets/**')
 }
 
 
@@ -200,22 +203,56 @@ tasks.register("mergeShadowWithIncludes", Jar) {
         archiveFileFrom.get().asFile.renameTo(archiveFileTo.get().asFile)
     }
 }
-project.assemble.dependsOn(mergeShadowWithIncludes)
 
-// configure the maven publication
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.archives_base_name
-            from components.java
+tasks.named('jar') {
+    archiveClassifier.set("")
+}
+
+javadoc {
+    enabled = false
+}
+
+tasks.named('javadocJar', Jar) {
+    exclude '**/*'
+}
+
+tasks.named('sourcesJar', Jar) {
+    exclude '**/*'
+}
+
+configurations.runtimeElements {
+    outgoing.artifacts.clear()
+}
+
+configurations.apiElements {
+    outgoing.artifacts.clear()
+}
+
+configurations.shadowRuntimeElements {
+    outgoing.artifacts.clear()
+    outgoing.artifact(tasks.named('jar'))
+}
+
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
+tasks.withType(GenerateMavenPom).configureEach { task ->
+    if (task.name == "generatePomFileForMavenPublication") {
+        task.doFirst {
+            task.pom.withXml { xml ->
+                def root = xml.asNode()
+                root.get("dependencies").each { dependenciesNode ->
+                    root.remove(dependenciesNode as Node)
+                }
+                root.appendNode('developers').appendNode('developer').appendNode('name', 'Flashback developer')
+            }
         }
     }
+}
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
+centralPublisher {
+    publishing {
+        it.autoPublish = true
     }
 }
