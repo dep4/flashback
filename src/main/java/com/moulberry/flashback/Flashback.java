@@ -139,7 +139,7 @@ public class Flashback {
     public static final int MAGIC = 0xD780E884;
     public static volatile Recorder RECORDER = null;
     public static ExportJob EXPORT_JOB = null;
-    private static FlashbackConfigV1 config;
+    private static FlashbackConfigV1 config=FlashbackConfigV1.tryLoadFromFolder(Minecraft.getInstance().gameDirectory.toPath());
     public static LatticeElements configElements = null;
     private static Path configDirectory = null;
 

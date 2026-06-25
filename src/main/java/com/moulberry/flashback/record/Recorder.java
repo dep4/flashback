@@ -152,6 +152,10 @@ public class Recorder {
     private volatile boolean wasPaused = false;
     private volatile boolean skippedPacketDueToWaitingForWrite = false;
 
+    static {
+        Flashback.initActions();
+    }
+
     public Recorder(RegistryAccess registryAccess) {
         this.asyncReplaySaver = new AsyncReplaySaver(registryAccess);
         this.configurationPacketCodec = ConfigurationProtocols.CLIENTBOUND.codec();
