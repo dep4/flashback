@@ -136,13 +136,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
-public class Flashback implements ModInitializer, ClientModInitializer {
+public class Flashback {
     public static final Logger LOGGER = LoggerFactory.getLogger("flashback");
 
     public static final int MAGIC = 0xD780E884;
     public static volatile Recorder RECORDER = null;
     public static ExportJob EXPORT_JOB = null;
-    private static FlashbackConfigV1 config;
+    private static FlashbackConfigV1 config=FlashbackConfigV1.tryLoadFromFolder(Minecraft.getInstance().gameDirectory.toPath());
     public static LatticeElements configElements = null;
     private static Path configDirectory = null;
 
@@ -163,14 +163,10 @@ public class Flashback implements ModInitializer, ClientModInitializer {
     public static long worldBorderLerpStartTime = -1L;
 
     private static final KeyMapping.Category category = KeyMapping.Category.register(createIdentifier("keybind"));
-    public static final KeyMapping createMarker1KeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping("flashback.keybind.create_marker_1",
-        InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
-    public static final KeyMapping createMarker2KeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping("flashback.keybind.create_marker_2",
-        InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
-    public static final KeyMapping createMarker3KeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping("flashback.keybind.create_marker_3",
-        InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
-    public static final KeyMapping createMarker4KeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping("flashback.keybind.create_marker_4",
-        InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
+    public static final KeyMapping createMarker1KeyBind = null;
+    public static final KeyMapping createMarker2KeyBind = null;
+    public static final KeyMapping createMarker3KeyBind = null;
+    public static final KeyMapping createMarker4KeyBind = null;
 
     public static final Identifier RECORDING_INFO_DEBUG_SCREEN_ID = createIdentifier("recording_info");
 
@@ -198,7 +194,6 @@ public class Flashback implements ModInitializer, ClientModInitializer {
         return configDirectory;
     }
 
-    @Override
     public void onInitialize() {
         PayloadTypeRegistry.clientboundPlay().register(FinishedServerTick.TYPE,
                 StreamCodec.unit(FinishedServerTick.INSTANCE));
@@ -217,7 +212,16 @@ public class Flashback implements ModInitializer, ClientModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(FlashbackRawCustomPayload.TYPE, FlashbackRawCustomPayload.STREAM_CODEC);
     }
 
-    @Override
+    public static void initActions() {
+        ActionRegistry.register(ActionNextTick.INSTANCE);
+        ActionRegistry.register(ActionGamePacket.INSTANCE);
+        ActionRegistry.register(ActionConfigurationPacket.INSTANCE);
+        ActionRegistry.register(ActionCreateLocalPlayer.INSTANCE);
+        ActionRegistry.register(ActionMoveEntities.INSTANCE);
+        ActionRegistry.register(ActionLevelChunkCached.INSTANCE);
+        ActionRegistry.register(ActionAccuratePlayerPosition.INSTANCE);
+    }
+
     public void onInitializeClient() {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve("flashback");
 
@@ -264,14 +268,7 @@ public class Flashback implements ModInitializer, ClientModInitializer {
 
         this.deleteUnusedReplayStates();
 
-        ActionRegistry.register(ActionNextTick.INSTANCE);
-        ActionRegistry.register(ActionGamePacket.INSTANCE);
-        ActionRegistry.register(ActionConfigurationPacket.INSTANCE);
-        ActionRegistry.register(ActionCreateLocalPlayer.INSTANCE);
-        ActionRegistry.register(ActionMoveEntities.INSTANCE);
-        ActionRegistry.register(ActionLevelChunkCached.INSTANCE);
-        ActionRegistry.register(ActionAccuratePlayerPosition.INSTANCE);
-
+        initActions();
         KeyframeRegistry.register(CameraKeyframeType.INSTANCE);
         KeyframeRegistry.register(CameraOrbitKeyframeType.INSTANCE);
         KeyframeRegistry.register(TrackEntityKeyframeType.INSTANCE);
