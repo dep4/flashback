@@ -1036,7 +1036,7 @@ public class Flashback {
 
         Recorder recorder = RECORDER;
         RECORDER = null;
-        recorder.endTickWithContext(true);
+        recorder.endTick(true);
 
         if (Flashback.getConfig().recordingControls.quicksave) {
             Path replayDir = getReplayFolder();
