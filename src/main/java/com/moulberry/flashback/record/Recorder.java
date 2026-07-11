@@ -14,7 +14,6 @@ import com.moulberry.flashback.RegistryMetaHelper;
 import com.moulberry.flashback.action.*;
 import com.moulberry.flashback.compat.BobbyUtil;
 import com.moulberry.flashback.compat.DistantHorizonsSupport;
-import com.moulberry.flashback.ext.ClientClockManagerExt;
 import com.moulberry.flashback.io.AsyncReplaySaver;
 import com.moulberry.flashback.io.ReplayWriter;
 import com.moulberry.flashback.mixin.compat.bobby.FakeChunkManagerAccessor;
@@ -23,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.ClientClockManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.BossHealthOverlay;
@@ -67,6 +67,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagNetworkSerialization;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.clock.ClockNetworkState;
+import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -92,6 +94,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -1021,7 +1024,7 @@ public class Recorder {
         // Level info
         WorldBorder worldBorder = level.getWorldBorder();
         gamePackets.add(new ClientboundInitializeBorderPacket(worldBorder));
-        gamePackets.add(new ClientboundSetTimePacket(level.getGameTime(), ((ClientClockManagerExt)level.clockManager()).flashback$encodeClockUpdates()));
+        gamePackets.add(new ClientboundSetTimePacket(level.getGameTime(), encodeClockUpdates(level.clockManager())));
         gamePackets.add(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
         if (level.isRaining()) {
             gamePackets.add(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0f));
@@ -1237,4 +1240,16 @@ public class Recorder {
         // Mods can mixin here if they want to add custom actions (using this.asyncReplayServer) or packets
     }
 
+    public Map<Holder<WorldClock>, ClockNetworkState> encodeClockUpdates(ClientClockManager cm) {
+        Map<Holder<WorldClock>, ClockNetworkState> data = new HashMap<>();
+        for (Map.Entry<Holder<WorldClock>, ClientClockManager.ClockInstance> entry : cm.clocks.entrySet()) {
+            var clock = entry.getValue();
+            data.put(entry.getKey(), new ClockNetworkState(
+                    clock.totalTicks,
+                    clock.partialTick,
+                    clock.rate
+            ));
+        }
+        return data;
+    }
 }

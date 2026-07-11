@@ -119,6 +119,7 @@ accessible field net/minecraft/server/level/ServerEntity lastSentYHeadRot B
 accessible field net/minecraft/server/level/ServerEntity wasOnGround Z
 accessible field net/minecraft/server/level/ServerEntity trackedDataValues Ljava/util/List;
 accessible field net/minecraft/server/level/ServerEntity updateInterval I
+accessible field net/minecraft/client/ClientClockManager clocks Ljava/util/Map;
 accessible class net/minecraft/client/ClientClockManager$ClockInstance
 accessible field net/minecraft/client/ClientClockManager$ClockInstance totalTicks J
 accessible field net/minecraft/client/ClientClockManager$ClockInstance partialTick F
