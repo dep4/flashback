@@ -14,10 +14,10 @@ import com.moulberry.flashback.RegistryMetaHelper;
 import com.moulberry.flashback.action.*;
 import com.moulberry.flashback.compat.BobbyUtil;
 import com.moulberry.flashback.compat.DistantHorizonsSupport;
-import com.moulberry.flashback.ext.ClientClockManagerExt;
 import com.moulberry.flashback.io.AsyncReplaySaver;
 import com.moulberry.flashback.io.ReplayWriter;
 import com.moulberry.flashback.mixin.compat.bobby.FakeChunkManagerAccessor;
+import com.moulberry.flashback.mixin.playback.MixinClientClockManager;
 import com.moulberry.flashback.packet.FlashbackAccurateEntityPosition;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -1032,7 +1032,7 @@ public class Recorder {
         // Level info
         WorldBorder worldBorder = level.getWorldBorder();
         gamePackets.add(new ClientboundInitializeBorderPacket(worldBorder));
-        gamePackets.add(new ClientboundSetTimePacket(level.getGameTime(), ((ClientClockManagerExt)level.clockManager()).flashback$encodeClockUpdates()));
+        gamePackets.add(new ClientboundSetTimePacket(level.getGameTime(), MixinClientClockManager.encodeClockUpdates(level.clockManager())));
         gamePackets.add(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
         if (level.isRaining()) {
             gamePackets.add(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0f));
