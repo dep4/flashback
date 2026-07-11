@@ -60,18 +60,18 @@ dependencies {
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.1.2")
 
     // MixinConstraints
-    include(implementation("com.moulberry:mixinconstraints:1.0.8"))
+    implementation("com.moulberry:mixinconstraints:1.0.8")
 
     // MixinSquared
-    include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.7-beta.1")))
+    implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.7-beta.1"))
 
     // Lattice (config)
-    include(implementation("com.moulberry:lattice:2.1.0"))
+    implementation("com.moulberry:lattice:2.1.0")
 
     // Apache stuff
-    include(implementation("org.apache.commons:commons-math3:3.6.1"))
-    include(implementation("org.apache.httpcomponents:httpclient:4.5.14"))
-    include(implementation("org.apache.httpcomponents:httpcore:4.4.16"))
+    implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents:httpcore:4.4.16")
 
     // Mod compatibility
     compileOnly("maven.modrinth:distanthorizons:Mt9bDAs6")
